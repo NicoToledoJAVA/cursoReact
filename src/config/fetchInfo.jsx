@@ -2,7 +2,7 @@
 const variables = {
     protocol: "https",
     domain: "vps-3858808-x.dattaweb.com",
-    port: 8444,
+    port: 8443,
     api: "wines"
 };
 
