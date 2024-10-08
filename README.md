@@ -1,6 +1,7 @@
 # React + Vite
 
-# Proyecto de Página de Vinos con Carrito de Compras
+# Navegá las ramas. Toledo. 
+# (Proyecto de Página de Vinos con Carrito de Compras)
 
 Este proyecto es parte de un examen parcial para el curso de React en Coderhouse 2024 y tiene como objetivo diseñar una página web para mostrar vinos con la funcionalidad de un carrito de compras implementado.
 
