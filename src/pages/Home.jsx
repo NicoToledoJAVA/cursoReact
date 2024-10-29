@@ -106,7 +106,7 @@ function Home() {
         toast: true,
         width: "20%",
         icon: "success",
-        title: "Producto agregado al carrito",
+        title: "Producto agregado a la venta",
         showConfirmButton: false,
         timer: 1500
       });
@@ -117,18 +117,18 @@ function Home() {
   const handleBuy = () => {
     const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     Swal.fire({
-      title: `El precio total de su compra es: $${totalAmount.toLocaleString('es-AR')}`,
-      text: "¿Quiere finalizar la compra?",
+      title: `El precio total de la venta es: $${totalAmount.toLocaleString('es-AR')}`,
+      text: "¿Quiere proceder a la venta?",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, comprar!",
+      confirmButtonText: "Sí, vender!",
       cancelButtonText: "No"
     }).then((result) => {
       if (result.isConfirmed) {
         Swal.fire({
           title: "Listo",
-          text: "Gracias por comprar con nosotros",
+          text: "¡Ha habido éxito en la venta!",
           icon: "success"
         });
         clearCart(); // Vaciar el carrito después de la compra
@@ -139,19 +139,19 @@ function Home() {
 
   const handleClearCart = () => {
     Swal.fire({
-      title: "¿Estás seguro que quieres cancelar la compra?",
+      title: "¿Estás seguro que quieres cancelar la venta?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, cancelar compra!",
+      confirmButtonText: "Sí, cancelar venta!",
       cancelButtonText: "No"
     }).then((result) => {
       if (result.isConfirmed) {
         clearCart(); // Llama a clearCart para vaciar el carrito
         Swal.fire({
-          title: "Compra cancelada",
-          text: "El carrito está vacío.",
+          title: "Venta cancelada",
+          text: "La venta está vacía.",
           icon: "success"
         });
         setShowCart(false);
@@ -163,7 +163,7 @@ function Home() {
   return (
     <div>
       <button className="button button-blue" onClick={toggleCart}>
-        Ver Carrito ({cartItems.length})
+        Ver Venta ({cartItems.length})
       </button>
 
       <table>
