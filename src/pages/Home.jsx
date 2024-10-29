@@ -1,22 +1,26 @@
-//src/pages/Home.jsx
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import url from '../config/fetchInfo';
 import '../css/style.css';
-import { useCart } from '../context/CarContext'; // Importar el contexto del carrito
-import Cart from '../components/Cart'; // Importar el componente del carrito
-import WineModal from '../components/WineModal'; // Importar el componente del modal
+import { useCart } from '../context/CarContext';
+import Cart from '../components/Cart';
+import WineModal from '../components/WineModal';
 
 function Home() {
   const [wines, setWines] = useState([]);
   const [selectedWine, setSelectedWine] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showCart, setShowCart] = useState(false); // Estado para mostrar/ocultar el carrito
-  const { cartItems, addItem } = useCart(); // aquí se trae el contexto custom del carrito que hicimos
-
+  const [showCart, setShowCart] = useState(false);
+  const { cartItems, addItem, clearCart } = useCart(); // Importa clearCart
   useEffect(() => {
     fetchWines();
   }, []);
+
+  useEffect(() => {
+    if (cartItems.length > 0 && !showCart) {
+      setShowCart(true);
+    }
+  }, [cartItems, showCart]);
 
   const fetchWines = () => {
     fetch(`${url}/getAll`)
@@ -37,11 +41,10 @@ function Home() {
   };
 
   const handleWineClick = (wineId) => {
-    // Verificar si el vino ya está en el carrito
     const isWineInCart = cartItems.some(wine => wine.id === wineId);
-    
+
     if (isWineInCart) {
-      const wine = wines.find(wine => wine.id === wineId); // Obtener el vino directamente desde la lista de vinos
+      const wine = wines.find(wine => wine.id === wineId);
       addToCart(wine);
       Swal.fire({
         position: "bottom-end",
@@ -53,34 +56,28 @@ function Home() {
         timer: 1500
       });
     } else {
-      // Si el vino no está en el carrito, entonces mostrar el modal
       fetch(`${url}/getWine?id=${wineId}`)
         .then(response => response.json())
         .then(data => {
           setSelectedWine(data);
-          setShowModal(true); // Mostrar el modal cuando se selecciona un vino
+          setShowModal(true);
         });
     }
   };
 
   const closeModal = () => {
-    setShowModal(false); // Cerrar el modal
+    setShowModal(false);
   };
 
   const toggleCart = () => {
-    setShowCart(!showCart); // Mostrar/ocultar el carrito
+    setShowCart(!showCart);
   };
 
   const addToCart = (wine) => {
-    // Verificar si el vino ya está en el carrito
     const existingWine = cartItems.find(vino => vino.id === wine.id);
-  
+
     if (existingWine) {
-      // Abrir el carrito si no está abierto
-      if (!showCart) {
-        toggleCart(); // Llama a toggleCart() para abrir el carrito
-      }
-      if (existingWine.quantity < 9) { // Si hay menos de 9 unidades, incrementar la cantidad
+      if (existingWine.quantity < 9) {
         addItem(wine, existingWine.quantity + 1);
         Swal.fire({
           position: "bottom-end",
@@ -91,7 +88,6 @@ function Home() {
           showConfirmButton: false,
           timer: 1500
         });
-        
       } else {
         Swal.fire({
           position: "bottom-end",
@@ -104,7 +100,7 @@ function Home() {
         });
       }
     } else {
-      addItem(wine, 1); // Agregar el vino al carrito si no existe
+      addItem(wine, 1);
       Swal.fire({
         position: "bottom-end",
         toast: true,
@@ -114,11 +110,55 @@ function Home() {
         showConfirmButton: false,
         timer: 1500
       });
-      
-      
     }
     closeModal();
-  };  
+  };
+
+  const handleBuy = () => {
+    const totalAmount = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    Swal.fire({
+      title: `El precio total de su compra es: $${totalAmount.toLocaleString('es-AR')}`,
+      text: "¿Quiere finalizar la compra?",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, comprar!",
+      cancelButtonText: "No"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Listo",
+          text: "Gracias por comprar con nosotros",
+          icon: "success"
+        });
+        clearCart(); // Vaciar el carrito después de la compra
+        setShowCart(false);
+      }
+    });
+  };
+
+  const handleClearCart = () => {
+    Swal.fire({
+      title: "¿Estás seguro que quieres cancelar la compra?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, cancelar compra!",
+      cancelButtonText: "No"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        clearCart(); // Llama a clearCart para vaciar el carrito
+        Swal.fire({
+          title: "Compra cancelada",
+          text: "El carrito está vacío.",
+          icon: "success"
+        });
+        setShowCart(false);
+      }
+    });
+  };
+  
 
   return (
     <div>
@@ -156,7 +196,12 @@ function Home() {
       </table>
 
       <WineModal selectedWine={selectedWine} showModal={showModal} closeModal={closeModal} addToCart={addToCart} />
-      <Cart showCart={showCart} toggleCart={toggleCart} /> {/* Renderizar el carrito aquí */}
+      <Cart
+        showCart={showCart}
+        toggleCart={toggleCart}
+        handleBuy={handleBuy}         // Pasa la función handleBuy
+        handleClearCart={handleClearCart} // Pasa la función handleClearCart
+      />
     </div>
   );
 }

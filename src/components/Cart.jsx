@@ -1,20 +1,20 @@
-//src/components/Cart.jsx
+// Cart.jsx
 import React from 'react';
 import Swal from 'sweetalert2';
-import { useCart } from '../context/CarContext'; // Importar el contexto del carrito
+import { useCart } from '../context/CarContext';
 
-const Cart = ({ showCart, toggleCart }) => {
-  const { cartItems, removeItem } = useCart(); // aquí se trae el contexto custom del carrito que hicimos
+const Cart = ({ showCart, toggleCart, handleBuy, handleClearCart }) => { // Recibe handleBuy y handleClearCart
+  const { cartItems, removeItem } = useCart();
 
   const removeFromCart = (wineId) => {
-    removeItem(wineId); // Eliminar el producto del carrito
+    removeItem(wineId);
   };
 
   if (!showCart) return null;
 
   let precioTotal = cartItems
-  .reduce((total, wine) => total + (wine.price * wine.quantity), 0)
-  .toLocaleString('es-AR');
+    .reduce((total, wine) => total + (wine.price * wine.quantity), 0)
+    .toLocaleString('es-AR');
 
   return (
     <div id="carrito" className="carrito-visible black-and-white">
@@ -33,7 +33,6 @@ const Cart = ({ showCart, toggleCart }) => {
                 <button
                   type="button"
                   className="btn-close"
-                 
                   onClick={() => removeFromCart(wine.id)}
                 >X</button>
               </li>
@@ -47,8 +46,8 @@ const Cart = ({ showCart, toggleCart }) => {
           </span>
         </div>
         <div className="list-cart-item cart-bot">
-          <button type="button" className="button button-green">Vender</button>
-          <button type="button" className="button button-red" onClick={toggleCart}>Cerrar</button>
+          <button type="button" className="button button-green" onClick={handleBuy}>Vender</button>
+          <button type="button" className="button button-red" onClick={handleClearCart}>Cerrar</button>
         </div>
       </div>
     </div>
