@@ -1,3 +1,4 @@
+//Home.jsx
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import url from '../config/fetchInfo';
@@ -5,6 +6,7 @@ import '../css/style.css';
 import { useCart } from '../context/CarContext';
 import Cart from '../components/Cart';
 import WineModal from '../components/WineModal';
+import Caracolerdo from '../components/LoadingCaracol.jsx'; // Importa el componente Caracol
 
 function Home() {
   const [wines, setWines] = useState([]);
@@ -12,6 +14,7 @@ function Home() {
   const [showModal, setShowModal] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const { cartItems, addItem, clearCart } = useCart(); // Importa clearCart
+  const [loading, setLoading] = useState(true); // Estado de carga
   useEffect(() => {
     fetchWines();
   }, []);
@@ -27,6 +30,7 @@ function Home() {
       .then(response => response.json())
       .then(data => {
         setWines(data);
+        setLoading(false); // Detiene el estado de carga
       });
   };
 
@@ -158,49 +162,59 @@ function Home() {
       }
     });
   };
-  
+
 
   return (
-    <div>
-      <button className="button button-blue" onClick={toggleCart}>
-        Ver Venta ({cartItems.length})
-      </button>
 
-      <table>
-        <thead>
-          <tr>
-            <th className="column-header">Nombre</th>
-            <th className="column-header">Año</th>
-            <th className="column-header">Tipo</th>
-            <th className="column-header">Categoría</th>
-            <th className="column-header">Precio</th>
-          </tr>
-        </thead>
-        <tbody>
-          {wines.map((wine) => (
-            <tr
-              key={wine.id}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-              onClick={() => handleWineClick(wine.id)}
-              style={{ cursor: 'pointer' }}
-            >
-              <td className="celdas alineacion-izq">{wine.name}</td>
-              <td className="celdas">{wine.year}</td>
-              <td className="celdas">{wine.type}</td>
-              <td className="celdas">{wine.category}</td>
-              <td className="celdas bolder">${wine.price.toLocaleString('es-AR')}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+
+
+      {loading ? ( // Condición para mostrar "Loading..."
+        <Caracolerdo/> // Muestra el componente Caracolerdo mientras carga
+      ) : (
+
+        <div>
+          <button className="button button-blue" onClick={toggleCart}>
+            Ver Venta ({cartItems.length})
+          </button>
+
+          <table>
+            <thead>
+              <tr>
+                <th className="column-header">Nombre</th>
+                <th className="column-header">Año</th>
+                <th className="column-header">Tipo</th>
+                <th className="column-header">Categoría</th>
+                <th className="column-header">Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {wines.map((wine) => (
+                <tr
+                  key={wine.id}
+                  onMouseOver={handleMouseOver}
+                  onMouseOut={handleMouseOut}
+                  onClick={() => handleWineClick(wine.id)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td className="celdas alineacion-izq">{wine.name}</td>
+                  <td className="celdas">{wine.year}</td>
+                  <td className="celdas">{wine.type}</td>
+                  <td className="celdas">{wine.category}</td>
+                  <td className="celdas bolder">${wine.price.toLocaleString('es-AR')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <WineModal selectedWine={selectedWine} showModal={showModal} closeModal={closeModal} addToCart={addToCart} />
       <Cart
         showCart={showCart}
         toggleCart={toggleCart}
-        handleBuy={handleBuy}         // Pasa la función handleBuy
-        handleClearCart={handleClearCart} // Pasa la función handleClearCart
+        handleBuy={handleBuy}
+        handleClearCart={handleClearCart}
       />
     </div>
   );
